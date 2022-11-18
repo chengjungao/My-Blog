@@ -52,6 +52,15 @@
                                                name="websiteIcon"
                                                placeholder="favicon.ico">
                                     </div>
+                                     <div class="form-group">
+                                      <label>站点主题</label>
+                                     <select class="form-control select2" style="width: 100%;" id="theme" name="theme"
+                                       th:value="${configurations.get('theme')}" data-placeholder="请选择主题...">
+                                        <option value="default" selected="selected">default</option>
+                                        <option value="amaze">amaze</option>
+                                        <option value="yummy-jekyll" >yummy</option>
+                                </select>
+                                </div>
                                     <div class="card-footer">
                                         <button type="button" id="updateWebsiteButton" onsubmit="return false;"
                                                 class="btn btn-danger float-right">确认修改

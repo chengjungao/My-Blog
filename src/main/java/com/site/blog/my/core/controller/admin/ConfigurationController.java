@@ -35,7 +35,8 @@ public class ConfigurationController {
     public Result website(@RequestParam(value = "websiteName", required = false) String websiteName,
                           @RequestParam(value = "websiteDescription", required = false) String websiteDescription,
                           @RequestParam(value = "websiteLogo", required = false) String websiteLogo,
-                          @RequestParam(value = "websiteIcon", required = false) String websiteIcon) {
+                          @RequestParam(value = "websiteIcon", required = false) String websiteIcon,
+                          @RequestParam(value = "theme", required = false) String theme) {
         int updateResult = 0;
         if (!StringUtils.isEmpty(websiteName)) {
             updateResult += configService.updateConfig("websiteName", websiteName);
@@ -48,6 +49,9 @@ public class ConfigurationController {
         }
         if (!StringUtils.isEmpty(websiteIcon)) {
             updateResult += configService.updateConfig("websiteIcon", websiteIcon);
+        }
+        if (!StringUtils.isEmpty(theme)) {
+            updateResult += configService.updateConfig("theme", theme);
         }
         return ResultGenerator.genSuccessResult(updateResult > 0);
     }

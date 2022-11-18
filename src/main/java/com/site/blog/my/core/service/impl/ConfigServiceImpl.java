@@ -31,6 +31,7 @@ public class ConfigServiceImpl implements ConfigService {
     public static final String footerCopyRight = "@2018 十三";
     public static final String footerPoweredBy = "personal blog";
     public static final String footerPoweredByURL = "##";
+    public static final String theme = "default";
 
     @Override
     public int updateConfig(String configName, String configValue) {
@@ -60,6 +61,9 @@ public class ConfigServiceImpl implements ConfigService {
             }
             if ("websiteIcon".equals(config.getKey()) && StringUtils.isEmpty(config.getValue())) {
                 config.setValue(websiteIcon);
+            }
+            if ("theme".equals(config.getKey()) && StringUtils.isEmpty(config.getValue())) {
+                config.setValue(theme);
             }
             if ("yourAvatar".equals(config.getKey()) && StringUtils.isEmpty(config.getValue())) {
                 config.setValue(yourAvatar);
