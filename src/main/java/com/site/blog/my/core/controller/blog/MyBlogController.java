@@ -160,6 +160,7 @@ public class MyBlogController {
         request.setAttribute("hotBlogs", blogService.getBlogListForIndexPage(0));
         request.setAttribute("hotTags", tagService.getBlogTagCountForIndex());
         Map<String,String> configurations  = configService.getAllConfigs();
+        request.setAttribute("configurations", configurations);
         return "blog/" +  configurations.get("theme")  + "/list";
     }
 

@@ -221,7 +221,7 @@ public class BlogServiceImpl implements BlogService {
     public BlogDetailVO getBlogDetail(Long id) {
         Blog blog = blogMapper.selectByPrimaryKey(id);
         //不为空且状态为已发布
-        BlogDetailVO blogDetailVO = getBlogDetailVO(blog);
+        BlogDetailVO blogDetailVO = getBlogDetailVO(blog,true);
         if (blogDetailVO != null) {
             return blogDetailVO;
         }
@@ -295,7 +295,7 @@ public class BlogServiceImpl implements BlogService {
     public BlogDetailVO getBlogDetailBySubUrl(String subUrl) {
         Blog blog = blogMapper.selectBySubUrl(subUrl);
         //不为空且状态为已发布
-        BlogDetailVO blogDetailVO = getBlogDetailVO(blog);
+        BlogDetailVO blogDetailVO = getBlogDetailVO(blog,false);
         if (blogDetailVO != null) {
             return blogDetailVO;
         }
@@ -308,8 +308,10 @@ public class BlogServiceImpl implements BlogService {
      * @param blog
      * @return
      */
-    private BlogDetailVO getBlogDetailVO(Blog blog) {
-        if (blog != null && blog.getBlogStatus() == 1) {
+    private BlogDetailVO getBlogDetailVO(Blog blog,Boolean filter) {
+	        if (blog == null || (filter && blog.getBlogStatus() != 1)) {
+	        	return null;
+	        }
             //增加浏览量
             blog.setBlogViews(blog.getBlogViews() + 1);
             blogMapper.updateByPrimaryKey(blog);
@@ -336,8 +338,6 @@ public class BlogServiceImpl implements BlogService {
             params.put("commentStatus", 1);//过滤审核通过的数据
             blogDetailVO.setCommentCount(blogCommentMapper.getTotalBlogComments(params));
             return blogDetailVO;
-        }
-        return null;
     }
 
     private List<BlogListVO> getBlogListVOsByBlogs(List<Blog> blogList) {

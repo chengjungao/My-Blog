@@ -106,7 +106,7 @@
         ,
         <include refid="Blob_Column_List"/>
         from tb_blog
-        where blog_sub_url = #{subUrl,jdbcType=VARCHAR} and is_deleted = 0 limit 1
+        where blog_sub_url = #{subUrl,jdbcType=VARCHAR} limit 1
     </select>
 
     <update id="deleteByPrimaryKey" parameterType="java.lang.Long">
