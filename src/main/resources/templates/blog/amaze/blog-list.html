@@ -38,7 +38,7 @@
                                     <img th:src="@{${blog.blogCoverImage}}" alt=""></a>
                             </div>
                             <div class="clearfix topic-footer">
-                                <span class="pull-left time mobile_time">2018-01</span>
+                                <span class="pull-left time mobile_time" th:text="${#dates.format(blog.createTime, 'yyyy-MM-dd')}">2018-01</span>
                             </div>
                     </article>
                 </th:block>

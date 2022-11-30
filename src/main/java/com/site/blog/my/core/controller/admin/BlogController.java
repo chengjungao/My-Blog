@@ -87,8 +87,8 @@ public class BlogController {
                        @RequestParam("blogTags") String blogTags,
                        @RequestParam("blogContent") String blogContent,
                        @RequestParam("blogCoverImage") String blogCoverImage,
-                       @RequestParam("blogStatus") Byte blogStatus,
-                       @RequestParam("enableComment") Byte enableComment) {
+                       @RequestParam("blogStatus") Integer blogStatus,
+                       @RequestParam("enableComment") Integer enableComment) {
         if (StringUtils.isEmpty(blogTitle)) {
             return ResultGenerator.genFailResult("请输入文章标题");
         }
@@ -139,8 +139,8 @@ public class BlogController {
                          @RequestParam("blogTags") String blogTags,
                          @RequestParam("blogContent") String blogContent,
                          @RequestParam("blogCoverImage") String blogCoverImage,
-                         @RequestParam("blogStatus") Byte blogStatus,
-                         @RequestParam("enableComment") Byte enableComment) {
+                         @RequestParam("blogStatus") Integer blogStatus,
+                         @RequestParam("enableComment") Integer enableComment) {
         if (StringUtils.isEmpty(blogTitle)) {
             return ResultGenerator.genFailResult("请输入文章标题");
         }

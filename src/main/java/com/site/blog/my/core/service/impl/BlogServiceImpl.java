@@ -9,6 +9,7 @@ import com.site.blog.my.core.entity.BlogCategory;
 import com.site.blog.my.core.entity.BlogTag;
 import com.site.blog.my.core.entity.BlogTagRelation;
 import com.site.blog.my.core.service.BlogService;
+import com.site.blog.my.core.solr.BlogSolrServer;
 import com.site.blog.my.core.util.MarkDownUtil;
 import com.site.blog.my.core.util.PageQueryUtil;
 import com.site.blog.my.core.util.PageResult;
@@ -36,6 +37,9 @@ public class BlogServiceImpl implements BlogService {
     private BlogTagRelationMapper blogTagRelationMapper;
     @Autowired
     private BlogCommentMapper blogCommentMapper;
+    
+    @Autowired
+    private BlogSolrServer blogSolrServer;
 
     @Override
     @Transactional
@@ -57,6 +61,8 @@ public class BlogServiceImpl implements BlogService {
         }
         //保存文章
         if (blogMapper.insertSelective(blog) > 0) {
+        	
+        	blogSolrServer.add(blog);
             //新增的tag对象
             List<BlogTag> tagListForInsert = new ArrayList<>();
             //所有的tag对象，用于建立关系数据
@@ -88,6 +94,7 @@ public class BlogServiceImpl implements BlogService {
                 blogTagRelation.setTagId(tag.getTagId());
                 blogTagRelations.add(blogTagRelation);
             }
+            
             if (blogTagRelationMapper.batchInsert(blogTagRelations) > 0) {
                 return "success";
             }
@@ -105,7 +112,15 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     public Boolean deleteBatch(Integer[] ids) {
-        return blogMapper.deleteBatch(ids) > 0;
+    	if (blogMapper.deleteBatch(ids) > 0) {
+    		String[] blogIds = new String[ids.length]; 
+    		for(int i = 0; i <= ids.length ; i ++) {
+    			blogIds[i] = String.valueOf(ids[i]);
+    		}
+    		blogSolrServer.delete(blogIds);
+    		return true;
+		}
+       return false;
     }
 
     @Override
@@ -183,6 +198,7 @@ public class BlogServiceImpl implements BlogService {
         blogTagRelationMapper.deleteByBlogId(blog.getBlogId());
         blogTagRelationMapper.batchInsert(blogTagRelations);
         if (blogMapper.updateByPrimaryKeySelective(blogForUpdate) > 0) {
+        	blogSolrServer.add(blogForUpdate);
             return "success";
         }
         return "修改失败";
@@ -276,17 +292,11 @@ public class BlogServiceImpl implements BlogService {
     @Override
     public PageResult getBlogsPageBySearch(String keyword, int page) {
         if (page > 0 && PatternUtil.validKeyword(keyword)) {
-            Map param = new HashMap();
-            param.put("page", page);
-            param.put("limit", 9);
-            param.put("keyword", keyword);
-            param.put("blogStatus", 1);//过滤发布状态下的数据
-            PageQueryUtil pageUtil = new PageQueryUtil(param);
-            List<Blog> blogList = blogMapper.findBlogList(pageUtil);
-            List<BlogListVO> blogListVOS = getBlogListVOsByBlogs(blogList);
-            int total = blogMapper.getTotalBlogs(pageUtil);
-            PageResult pageResult = new PageResult(blogListVOS, total, pageUtil.getLimit(), pageUtil.getPage());
-            return pageResult;
+        	PageResult pageResultTemp = blogSolrServer.search(keyword, page, 9);
+            @SuppressWarnings("unchecked")
+			List<BlogListVO> blogListVOS = getBlogListVOsByBlogs((List<Blog>) pageResultTemp.getList());
+            pageResultTemp.setList(blogListVOS);
+            return pageResultTemp;
         }
         return null;
     }

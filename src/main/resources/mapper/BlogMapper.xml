@@ -34,7 +34,15 @@
         from tb_blog
         where blog_id = #{blogId,jdbcType=BIGINT} and is_deleted = 0
     </select>
-    <select id="findBlogList" parameterType="Map" resultMap="BaseResultMap">
+    <select id="findAll" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>,
+        <include refid="Blob_Column_List"/>
+        from tb_blog
+        where is_deleted=0
+        order by blog_id desc
+    </select>
+   <select id="findBlogList" parameterType="Map" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from tb_blog
@@ -52,7 +60,7 @@
         <if test="start!=null and limit!=null">
             limit #{start},#{limit}
         </if>
-    </select>
+    </select> 
 
     <select id="getTotalBlogs" parameterType="Map" resultType="int">
         select count(*) from tb_blog

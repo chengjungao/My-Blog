@@ -4,34 +4,54 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.Date;
 
+import org.apache.solr.client.solrj.beans.Field;
+
 public class Blog {
+	
+	@Field("id")
+	private String id;
+	
+	@Field("blogId")
     private Long blogId;
 
+	@Field("blogTitle")
     private String blogTitle;
 
+	@Field("blogSubUrl")
     private String blogSubUrl;
 
+	@Field("blogCoverImage")
     private String blogCoverImage;
 
+	@Field("blogCategoryId")
     private Integer blogCategoryId;
 
+	@Field("blogCategoryName")
     private String blogCategoryName;
 
+	@Field("blogTags")
     private String blogTags;
 
-    private Byte blogStatus;
+	@Field("blogStatus")
+    private Integer blogStatus;
 
+	@Field("blogViews")
     private Long blogViews;
 
-    private Byte enableComment;
+	@Field("enableComment")
+    private Integer enableComment;
 
-    private Byte isDeleted;
+	@Field("isDeleted")
+    private Integer isDeleted;
 
+	@Field("createTime")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
+	@Field("updateTime")
     private Date updateTime;
 
+	@Field("blogContent")
     private String blogContent;
 
     public Long getBlogId() {
@@ -90,39 +110,40 @@ public class Blog {
         this.blogTags = blogTags == null ? null : blogTags.trim();
     }
 
-    public Byte getBlogStatus() {
-        return blogStatus;
-    }
+    
+    public Integer getBlogStatus() {
+		return blogStatus;
+	}
 
-    public void setBlogStatus(Byte blogStatus) {
-        this.blogStatus = blogStatus;
-    }
+	public void setBlogStatus(Integer blogStatus) {
+		this.blogStatus = blogStatus;
+	}
 
-    public Long getBlogViews() {
-        return blogViews;
-    }
+	public Long getBlogViews() {
+		return blogViews;
+	}
 
-    public void setBlogViews(Long blogViews) {
-        this.blogViews = blogViews;
-    }
+	public void setBlogViews(Long blogViews) {
+		this.blogViews = blogViews;
+	}
 
-    public Byte getEnableComment() {
-        return enableComment;
-    }
+	public Integer getEnableComment() {
+		return enableComment;
+	}
 
-    public void setEnableComment(Byte enableComment) {
-        this.enableComment = enableComment;
-    }
+	public void setEnableComment(Integer enableComment) {
+		this.enableComment = enableComment;
+	}
 
-    public Byte getIsDeleted() {
-        return isDeleted;
-    }
+	public Integer getIsDeleted() {
+		return isDeleted;
+	}
 
-    public void setIsDeleted(Byte isDeleted) {
-        this.isDeleted = isDeleted;
-    }
+	public void setIsDeleted(Integer isDeleted) {
+		this.isDeleted = isDeleted;
+	}
 
-    public Date getCreateTime() {
+	public Date getCreateTime() {
         return createTime;
     }
 
@@ -146,7 +167,15 @@ public class Blog {
         this.blogContent = blogContent == null ? null : blogContent.trim();
     }
 
-    @Override
+    public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	@Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(getClass().getSimpleName());
