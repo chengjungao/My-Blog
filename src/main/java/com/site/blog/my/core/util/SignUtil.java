@@ -5,8 +5,7 @@ import java.util.Arrays;
 
 public class SignUtil {
 
-    public static boolean checkSignature(String signature, String timestamp, String nonce) {
-        String TOKEN = System.getProperty("token");
+    public static boolean checkSignature(String signature, String timestamp, String nonce,String TOKEN) {
         String[] arr = new String[]{TOKEN, timestamp, nonce};
         Arrays.sort(arr);
         StringBuilder content = new StringBuilder();

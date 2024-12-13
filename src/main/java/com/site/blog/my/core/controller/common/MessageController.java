@@ -3,6 +3,7 @@ import com.site.blog.my.core.entity.Message;
 import com.site.blog.my.core.service.MessageService;
 import com.site.blog.my.core.util.SignUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
@@ -10,27 +11,29 @@ import java.io.IOException;
 import java.util.Date;
 
 @RestController
-@RequestMapping("/api/xxxxx")
+@RequestMapping("/api/xxx")
 public class MessageController {
 
     @Autowired
     private MessageService messageService;
 
+    @Value("${token:}")
+    private String token;
 
-    @GetMapping("/xxxxx")
+    @GetMapping("/xxx")
     public String verify(
             @RequestParam("signature") String signature,
             @RequestParam("timestamp") String timestamp,
             @RequestParam("nonce") String nonce,
             @RequestParam("echostr") String echostr) {
 
-        if (SignUtil.checkSignature(signature, timestamp, nonce)) {
+        if (SignUtil.checkSignature(signature, timestamp, nonce,token)) {
             return echostr;
         }
         return "校验失败";
     }
 
-    @PostMapping("/xxxxx")
+    @PostMapping("/wechat")
     public String handleMessage(HttpServletRequest request) {
         try {
             BufferedReader reader = request.getReader();
@@ -41,10 +44,10 @@ public class MessageController {
                 xmlData.append(line);
             }
 
-            String fromUser = getTagValue(xmlData.toString(), "FromUserName");
-            String toUser = getTagValue(xmlData.toString(), "ToUserName");
-            String content = getTagValue(xmlData.toString(), "Content");
-            String msgType = getTagValue(xmlData.toString(), "MsgType");
+            String fromUser = extractTagValue(xmlData.toString(), "FromUserName");
+            String toUser = extractTagValue(xmlData.toString(), "ToUserName");
+            String content = extractTagValue(xmlData.toString(), "Content");
+            String msgType = extractTagValue(xmlData.toString(), "MsgType");
 
             // 存储消息到数据库
             Message message = new Message(fromUser, toUser, content, msgType, new Date());
@@ -59,10 +62,18 @@ public class MessageController {
     }
 
     // 解析XML节点值
-    private String getTagValue(String xml, String tagName) {
-        int start = xml.indexOf("<" + tagName + ">") + tagName.length() + 2;
-        int end = xml.indexOf("</" + tagName + ">");
-        return start > end ? "" : xml.substring(start, end);
+    // 提取 XML 标签值的方法
+    private String extractTagValue(String xml, String tagName) {
+        String startTag = "<" + tagName + "><![CDATA[";
+        String endTag = "]]></" + tagName + ">";
+
+        int startIndex = xml.indexOf(startTag);
+        int endIndex = xml.indexOf(endTag);
+
+        if (startIndex != -1 && endIndex != -1) {
+            return xml.substring(startIndex + startTag.length(), endIndex).trim();
+        }
+        return "未找到 " + tagName + " 标签";
     }
 
     // 构建回复XML消息
