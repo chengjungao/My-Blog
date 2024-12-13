@@ -1,6 +1,7 @@
 package com.site.blog.my.core.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.site.blog.my.core.entity.Message;
 import com.site.blog.my.core.service.ChatService;
@@ -30,50 +31,49 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public String chat(String content, String user, List<Message> history) {
+        try {
+            // 构建请求头
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Content-Type", "application/json");
+            headers.set("Authorization", "Bearer " + token);
 
-        // 构建请求头
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Content-Type", "application/json");
-        headers.set("Authorization", "Bearer " + token);
+            HttpEntity<String> entity = getStringHttpEntity(content, user, history, headers);
 
-        HttpEntity<String> entity = getStringHttpEntity(content,user,history, headers);
+            // 发送请求
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+            JSONObject jsonObject = JSON.parseObject(response.getBody());
+            return jsonObject.getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content");
 
-        // 发送请求
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-        JSONObject jsonObject = JSON.parseObject(response.getBody());
-        if (jsonObject != null){
-            return  jsonObject.getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content");
-        }else {
-            return  "助手暂时出现故障，无法响应您的问题！";
+        }catch (Exception e)
+        {
+            return "助手暂时出现故障，无法响应您的问题！";
         }
+
 
     }
 
     private static HttpEntity<String> getStringHttpEntity(String content, String user,List<Message> history,HttpHeaders headers) {
-        String requestBody = "{"
-                + "\"model\": \"glm-4-plus\","
-                + "\"temperature\": 0.1,"
-                + "\"messages\": ["
-                + "    {\"role\": \"system\", \"content\": \"你是代码江湖公众号的智能助手，可以为用户提供准确和专业的回答\"},";
+        JSONObject requestBody = new JSONObject();
+        requestBody.put("model", "glm-4-plus");
+        requestBody.put("temperature", 0.1);
+        JSONArray messages = new JSONArray();
+        messages.add(new JSONObject().fluentPut("role", "system").fluentPut("content", "你是代码江湖公众号的智能助手，可以为用户提供准确和专业的回答"));
+
         if (history != null && !history.isEmpty()){
             Collections.reverse(history);
             for (Message message : history) {
                 if (!message.getFromUser().equals(user)){
-                    requestBody += "{\"role\": \"assistant\", \"content\": \"" + message.getContent() + "\"},";
+                    messages.add(new JSONObject().fluentPut("role", "assistant").fluentPut("content", message.getContent()));
                 }else {
-                    requestBody += "{\"role\": \"user\", \"content\": \"" + message.getContent() + "\"},";
+                    messages.add(new JSONObject().fluentPut("role", "user").fluentPut("content", message.getContent()));
                 }
             }
         }
 
+        messages.add(new JSONObject().fluentPut("role", "user").fluentPut("content", content));
+        requestBody.put("messages", messages);
+        requestBody.put("tools", new JSONArray().fluentAdd(new JSONObject().fluentPut("type", "web_search").fluentPut("web_search", new JSONObject().fluentPut("search_result", true))));
 
-        requestBody += "    {\"role\": \"user\", \"content\": \"" + content + "\"}"
-                + "],"
-                + "\"tools\": ["
-                + "    {\"type\": \"web_search\", \"web_search\": {\"search_result\": true}}"
-                + "]"
-                + "}";
-
-        return new HttpEntity<>(requestBody, headers);
+        return new HttpEntity<>(requestBody.toString(), headers);
     }
 }

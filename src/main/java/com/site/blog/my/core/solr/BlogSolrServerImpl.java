@@ -1,13 +1,11 @@
 package com.site.blog.my.core.solr;
 
-import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.springframework.beans.factory.annotation.Value;
@@ -60,6 +58,7 @@ public class BlogSolrServerImpl implements BlogSolrServer {
 	@Override
 	public void add(Blog blog) {
 		try {
+			blog.setId(String.valueOf(blog.getBlogId()));
 			solrServer.addBean(blog);
 			solrServer.commit();
 		} catch (Exception e) {
