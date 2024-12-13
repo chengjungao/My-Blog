@@ -16,7 +16,7 @@
   <insert id="insert" parameterType="com.site.blog.my.core.entity.Message">
     insert into tb_messages (fromUser, toUser, content, msgType, createTime)
     values (#{fromUser,jdbcType=VARCHAR}, #{toUser,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR},
-      #{msgType,jdbcType=VARCHAR}, #{createTime,jdbcType=DATE})
+      #{msgType,jdbcType=VARCHAR}, #{createTime})
   </insert>
 
   <select id="selectByUser" parameterType="Map" resultMap="BaseResultMap">

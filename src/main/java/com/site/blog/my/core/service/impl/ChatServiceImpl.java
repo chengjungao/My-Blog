@@ -2,7 +2,6 @@ package com.site.blog.my.core.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.JSONPObject;
 import com.site.blog.my.core.entity.Message;
 import com.site.blog.my.core.service.ChatService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,9 +59,9 @@ public class ChatServiceImpl implements ChatService {
             Collections.reverse(history);
             for (Message message : history) {
                 if (!message.getFromUser().equals(user)){
-                    requestBody += "{\"role\": \"assistant\", \"content\": \\" + message.getContent() + "},";
+                    requestBody += "{\"role\": \"assistant\", \"content\": \"" + message.getContent() + "\"},";
                 }else {
-                    requestBody += "{\"role\": \"user\", \"content\": \\" + message.getContent() + "},";
+                    requestBody += "{\"role\": \"user\", \"content\": \"" + message.getContent() + "\"},";
                 }
             }
         }
