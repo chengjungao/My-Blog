@@ -12,16 +12,19 @@ public class Message {
     private String msgType;
     private Date createTime;
 
+    private String msgId;
+
     public Message( ){
         super();
     }
 
-    public Message(String fromUser, String toUser, String content, String msgType, Date createTime) {
+    public Message(String fromUser, String toUser, String content, String msgType, Date createTime, String msgId) {
         this.fromUser = fromUser;
         this.toUser = toUser;
         this.content = content;
         this.msgType = msgType;
         this.createTime = createTime;
+        this.msgId = msgId;
     }
 
     // Getters 和 Setters
@@ -54,5 +57,13 @@ public class Message {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getMsgId() {
+        return msgId;
+    }
+
+    public void setMsgId(String msgId) {
+        this.msgId = msgId;
     }
 }

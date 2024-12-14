@@ -11,4 +11,7 @@ public interface MessageMapper {
 
     List<Message> selectByUser(@Param("user") String user);
 
+
+    List<Message> selectByMsgId(@Param("msgId") String msgId);
+
 }

@@ -21,20 +21,38 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public Message handleMessage(Message message) {
         Message replyMessage = new Message();
-        // 查询历史消息
-        List<Message> historyMessages = messageMapper.selectByUser(message.getFromUser());
-        // 插入新消息
-        messageMapper.insert(message);
 
-        replyMessage.setContent(chatService.chat(message.getContent(),message.getFromUser(), historyMessages));
-        replyMessage.setToUser(message.getFromUser());
-        replyMessage.setFromUser(message.getToUser());
-        replyMessage.setMsgType("text");
-        replyMessage.setCreateTime(new java.util.Date());
+        //查询msgId为当前的消息的Id防止重试
+        List<Message> messagesTemp = messageMapper.selectByMsgId(message.getMsgId());
+        if (messagesTemp != null && !messagesTemp.isEmpty()){
+             for (Message msg : messagesTemp){
+                if (msg.getToUser().equals(message.getFromUser())){
+                    return msg;
+                }
+             }
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            throw new RuntimeException("Time out!");
+        }else {
+            // 查询历史消息
+            List<Message> historyMessages = messageMapper.selectByUser(message.getFromUser());
+            // 插入新消息
+            messageMapper.insert(message);
 
-        // 插入回复消息
-        messageMapper.insert(replyMessage);
+            replyMessage.setContent(chatService.chat(message.getContent(),message.getFromUser(), historyMessages));
+            replyMessage.setToUser(message.getFromUser());
+            replyMessage.setFromUser(message.getToUser());
+            replyMessage.setMsgType("text");
+            replyMessage.setCreateTime(new java.util.Date());
+            replyMessage.setMsgId(message.getMsgId());
 
-        return replyMessage;
+            // 插入回复消息
+            messageMapper.insert(replyMessage);
+
+            return replyMessage;
+        }
     }
 }

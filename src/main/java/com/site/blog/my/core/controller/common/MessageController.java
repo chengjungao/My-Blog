@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.Date;
 
 @RestController
-@RequestMapping("/api/xxx")
+@RequestMapping("/api/xxxx")
 public class MessageController {
 
     @Autowired
@@ -20,7 +20,7 @@ public class MessageController {
     @Value("${token:}")
     private String token;
 
-    @GetMapping("/xxx")
+    @GetMapping("/xxxx")
     public String verify(
             @RequestParam("signature") String signature,
             @RequestParam("timestamp") String timestamp,
@@ -33,7 +33,7 @@ public class MessageController {
         return "校验失败";
     }
 
-    @PostMapping("/wechat")
+    @PostMapping("/xxxxx")
     public String handleMessage(HttpServletRequest request) {
         try {
             BufferedReader reader = request.getReader();
@@ -48,16 +48,15 @@ public class MessageController {
             String toUser = extractTagValue(xmlData.toString(), "ToUserName");
             String content = extractTagValue(xmlData.toString(), "Content");
             String msgType = extractTagValue(xmlData.toString(), "MsgType");
+            String msgId = extractTagValue(xmlData.toString(), "MsgId");
 
-            // 存储消息到数据库
-            Message message = new Message(fromUser, toUser, content, msgType, new Date());
+            Message message = new Message(fromUser, toUser, content, msgType, new Date(),msgId);
 
 
             return buildReplyMessage(messageService.handleMessage(message));
 
         } catch (IOException e) {
-            e.printStackTrace();
-            return "处理失败";
+            throw new RuntimeException("Time Out! Please retry!");
         }
     }
 
