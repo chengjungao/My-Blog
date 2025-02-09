@@ -33,7 +33,7 @@ public class MessageController {
         return "校验失败";
     }
 
-    @PostMapping("/xxxxx")
+    @PostMapping("/xxxx")
     public String handleMessage(HttpServletRequest request) {
         try {
             BufferedReader reader = request.getReader();
@@ -46,13 +46,18 @@ public class MessageController {
 
             String fromUser = extractTagValue(xmlData.toString(), "FromUserName");
             String toUser = extractTagValue(xmlData.toString(), "ToUserName");
-            String content = extractTagValue(xmlData.toString(), "Content");
             String msgType = extractTagValue(xmlData.toString(), "MsgType");
-            String msgId = extractTagValue(xmlData.toString(), "MsgId");
+            String msgId = extractTagIntValue(xmlData.toString(), "MsgId");
+            String content = null;
+            if (msgType.equals("event")){
+                return buildReplyMessage(new Message(toUser,fromUser,"谢谢你长的如此好看，还关注我！","text",new Date(),msgId));
+            }else if (msgType.equals("text")){
+                content= extractTagValue(xmlData.toString(), "Content");
+            }else if (msgType.equals("image")){
+                content= extractTagValue(xmlData.toString(), "PicUrl");
+            }
 
             Message message = new Message(fromUser, toUser, content, msgType, new Date(),msgId);
-
-
             return buildReplyMessage(messageService.handleMessage(message));
 
         } catch (IOException e) {
@@ -66,13 +71,25 @@ public class MessageController {
         String startTag = "<" + tagName + "><![CDATA[";
         String endTag = "]]></" + tagName + ">";
 
+        return extractTagValue(startTag, endTag, xml);
+    }
+
+    private String extractTagIntValue(String xml, String tagName) {
+        String startTag = "<" + tagName + ">";
+        String endTag = "</" + tagName + ">";
+
+       return extractTagValue(startTag, endTag, xml);
+    }
+
+    private String extractTagValue(String startTag, String endTag,String xml) {
         int startIndex = xml.indexOf(startTag);
         int endIndex = xml.indexOf(endTag);
 
         if (startIndex != -1 && endIndex != -1) {
             return xml.substring(startIndex + startTag.length(), endIndex).trim();
         }
-        return "未找到 " + tagName + " 标签";
+        return null;
+
     }
 
     // 构建回复XML消息

@@ -28,7 +28,7 @@
     <if test="user!=null">
       AND (fromUser = #{user} or toUser = #{user})
     </if>
-    order by createTime desc limit 4
+    order by createTime desc limit 2
   </select>
 
   <select id="selectByMsgId" parameterType="Map" resultMap="BaseResultMap">
@@ -39,6 +39,6 @@
     <if test="msgId!=null">
       AND msgId = #{msgId}
     </if>
-    order by createTime desc limit 4
+    order by createTime desc limit 2
   </select>
 </mapper>

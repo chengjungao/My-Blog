@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface ChatService {
     public String chat(String content, String user,List<Message> history);
+
+    public String vision(String content);
 }
